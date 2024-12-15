@@ -1,197 +1,134 @@
-import { useEffect, useState } from 'react';
-import { Avatar, Button, Form, Input, List, Modal, Upload } from 'antd';
-import type { UploadProps } from 'antd';
-import { DeleteFilled, EditFilled, UploadOutlined } from '@ant-design/icons';
+import NavMenu from '@/components/NavMenu';
+import {
+	ColumnDef,
+	getCoreRowModel,
+	useReactTable,
+} from '@tanstack/react-table';
+import { Edit3, Trash2 } from 'lucide-react';
 
-function Ambulances() {
+import DoctorFormDialog from '@/components/DoctorFormDialog';
+import Paginate from '@/components/Paginate';
+import { TableData } from '@/components/TableData';
+import { Input } from '@/components/ui/input';
+import { getImageUrl } from '@/lib/utils';
+import { useDeleteAmbulance } from '@/services/mutations';
+import { useAmbulances } from '@/services/queries';
+import { Ambulance } from '@/types/ambulance';
+import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
+import { useState } from 'react';
 
-    interface DataType {
-        gender: string;
-        name: {
-            title: string;
-            first: string;
-            last: string;
-        };
-        email: string;
-        picture: {
-            large: string;
-            medium: string;
-            thumbnail: string;
-        };
-        nat: string;
-    }
+const columns: ColumnDef<Ambulance>[] = [
+	{
+		accessorKey: 'id',
+		header: 'ID',
+		cell: ({ row }) => <div className="capitalize">{row.original.id}</div>,
+	},
+	{
+		accessorKey: 'imageFileKey',
+		header: 'Image',
+		cell: ({ row }) => (
+			<Avatar className="h-8 w-8 rounded-lg">
+				<AvatarImage
+					src={getImageUrl(row.original.imageFileKey)}
+					className="h-10 w-10 rounded-lg"
+				/>
+				<AvatarFallback className="h-8 w-8 rounded-lg ">DR.</AvatarFallback>
+			</Avatar>
+		),
+	},
+	{
+		accessorKey: 'title',
+		header: 'Title',
+		cell: ({ row }) => <div className="capitalize">{row.original.title}</div>,
+	},
+	{
+		accessorKey: 'contact',
+		header: 'Contact',
+		cell: ({ row }) => (
+			<div className="lowercase">{row.original.contact ?? '--'}</div>
+		),
+	},
+	{
+		accessorKey: 'description',
+		header: 'Description',
+		cell: ({ row }) => (
+			<div className="lowercase">{row.original.description ?? '--'}</div>
+		),
+	},
+	{
+		accessorKey: 'delete',
+		header: 'Delete',
+		cell: () => <Trash2 />,
+	},
+	{
+		accessorKey: 'update',
+		header: 'Edit',
+		cell: () => <Edit3 />,
+	},
+];
+export default function Ambulances() {
+	const [page, setPage] = useState<number>(1);
+	const [limit, setLimit] = useState<number>(10);
+	const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+	const [search, setSearch] = useState<string | null>();
 
+	const deleteAmbulanceMutation = useDeleteAmbulance();
 
-    const [loading, setLoading] = useState(false);
-    const [data, setData] = useState<DataType[]>([]);
+	const { data, isPending, isError } = useAmbulances({
+		page,
+		limit,
+		search,
+	});
 
+	const table = useReactTable({
+		data: data?.data ?? [],
+		columns: columns,
+		getCoreRowModel: getCoreRowModel(),
+	});
 
-    const [form] = Form.useForm();
+	if (isError) {
+		return <div>Something went wrong while fetching data...</div>;
+	}
 
-    const [open, setOpen] = useState(false);
-
-    const showModal = () => {
-        setOpen(true);
-    };
-
-
-
-    const handleCancel = () => {
-        setOpen(false);
-    };
-
-    const loadMoreData = () => {
-        if (loading) {
-            return;
-        }
-        setLoading(true);
-        fetch('https://randomuser.me/api/?results=10&inc=name,gender,email,nat,picture&noinfo')
-            .then((res) => res.json())
-            .then((body) => {
-                setData([...data, ...body.results]);
-                setLoading(false);
-            })
-            .catch(() => {
-                setLoading(false);
-            });
-    };
-
-
-
-    useEffect(() => {
-        loadMoreData();
-    }, []);
-
-
-    const handleOk = async () => {
-
-        setLoading(true);
-        console.log("values", form.getFieldsValue());
-        const { title, description } = form.getFieldsValue()
-        const requestData = {
-            name: title,
-            email: description
-        };
-
-        const response = await fetch('https://example.com/api/submit', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(requestData),
-        });
-
-        if (!response.ok) {
-            throw new Error('Request failed!');
-        }
-
-
-        setTimeout(() => {
-            setLoading(false);
-            setOpen(false);
-        }, 3000);
-    };
-
-    const onEdit = (item: any) => {
-        setOpen(true);
-        form.setFieldsValue({
-            title: item?.name?.title,
-            description: item?.email
-        })
-    }
-
-    const onDelete = (item: any) => {
-        console.log("delete", item.id);
-    }
-
-
-
-    const props: UploadProps = {
-        action: 'http://localhost:3000/upload',
-        onChange({ file, fileList }) {
-
-            if (file.status !== 'uploading') {
-                console.log(file, fileList);
-            }
-        }
-    }
-
-    return (
-        <>
-            <div style={{ display: 'flex', justifyContent: 'end' }}>
-                <Button type="primary" onClick={showModal}>
-                    Create
-                </Button>
-            </div>
-
-            <div
-                id="scrollableDiv"
-                style={{
-                    height: 400,
-                    overflow: 'auto',
-                    padding: '0 16px',
-                    border: '1px solid rgba(140, 140, 140, 0.35)',
-                }}
-            >
-                <List
-                    dataSource={data}
-                    pagination={{ position: 'bottom', align: 'end', defaultPageSize: 5 }}
-                    renderItem={(item) => (
-                        <List.Item key={item.email}>
-                            <List.Item.Meta
-                                avatar={<Avatar src={item.picture.large} />}
-                                title={<a href="https://ant.design">{item.name.last}</a>}
-                                description={item.email}
-                            />
-                            <div style={{ justifyContent: 'space-between' }}>
-                                <div> <EditFilled onClick={() => { onEdit(item) }} /></div>
-                                <div><DeleteFilled onClick={() => { onDelete(item) }} /></div>
-                            </div>
-
-                        </List.Item>
-                    )}
-                />
-            </div>
-
-            <Modal
-                open={open}
-                title="Create"
-                onCancel={handleCancel}
-                footer={null}
-            >
-                <Form form={form} onFinish={handleOk}>
-                    <Form.Item
-                        label="Title"
-                        name="title"
-                        rules={[{ required: true, message: 'Title is required' }]}
-                    >
-                        <Input />
-                    </Form.Item>
-                    <Form.Item
-                        label="Description"
-                        name="description"
-                        rules={[{ required: true, message: 'Description is required' }]}
-                    >
-                        <Input />
-                    </Form.Item>
-
-                    <Upload {...props}>
-                        <Button icon={<UploadOutlined />}>Upload</Button>
-                    </Upload>
-
-                    <div style={{ display: 'flex', justifyContent: 'end' }}>
-                        <Button key="back" onClick={handleCancel}>
-                            Return
-                        </Button>
-                        <Button key="submit" type="primary" loading={loading} htmlType="submit">
-                            Submit
-                        </Button>
-                    </div>
-                </Form>
-            </Modal>
-        </>
-    )
-
+	return (
+		<>
+			<NavMenu />
+			<div className="w-full items-center">
+				<div className="flex items-center justify-between">
+					<div className="flex items-center justify-start py-4 m-12">
+						<h1 className="text-2xl font-bold mb-2">Ambulances</h1>
+					</div>
+					<div className="flex items-center justify-end py-4 m-12">
+						<Input
+							placeholder="Search ambulances..."
+							value={
+								(table.getColumn('contact')?.getFilterValue() as string) ?? ''
+							}
+							onChange={(event) =>
+								table.getColumn('contact')?.setFilterValue(event.target.value)
+							}
+							className="max-w-sm justify-end"
+						/>
+					</div>
+				</div>
+				<div className="rounded-md border">
+					<TableData<Ambulance>
+						isPending={isPending}
+						table={table}
+						columns={columns}
+						deleteMutation={deleteAmbulanceMutation}
+					/>
+				</div>
+				<div className="flex items-center justify-end space-x-2 py-4">
+					<Paginate page={page} setPage={setPage} />
+				</div>
+			</div>
+			{isEditDialogOpen ? (
+				<DoctorFormDialog
+					open={isEditDialogOpen}
+					setOpen={setIsEditDialogOpen}
+				/>
+			) : null}
+		</>
+	);
 }
-
-export default Ambulances

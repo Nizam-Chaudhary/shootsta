@@ -67,7 +67,7 @@ export async function getAmbulances(page = 1, limit = 10) {
 		message: 'Ambulance list fetched successfully',
 		page: page,
 		total: total[0].count,
-		ambulances: ambulanceList,
+		data: ambulanceList,
 	};
 }
 
@@ -83,7 +83,7 @@ export async function getAmbulanceById(id: number) {
 	return {
 		status: true,
 		message: 'Ambulance details fetched successfully',
-		ambulance: ambulance,
+		data: ambulance,
 	};
 }
 
@@ -104,6 +104,6 @@ export async function softDeleteAmbulance(id: number) {
 	return {
 		status: true,
 		message: 'Ambulance removed successfully',
-		ambulance: ambulance,
+		data: ambulance,
 	};
 }

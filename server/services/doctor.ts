@@ -31,6 +31,12 @@ export async function updateDoctor(id: number, doctor: UpdateDoctor) {
 	if (updatedDoctor.length <= 0) {
 		throw new AppError('Doctor not found', 404);
 	}
+
+	return {
+		status: true,
+		message: 'Doctor details updated successfully',
+		data: updatedDoctor,
+	};
 }
 
 export async function getDoctors(page = 1, limit = 10) {
@@ -57,7 +63,7 @@ export async function getDoctors(page = 1, limit = 10) {
 		message: 'Doctor list fetched successfully',
 		page: page,
 		total: total[0].count,
-		doctors: doctorList,
+		data: doctorList,
 	};
 }
 
@@ -73,7 +79,7 @@ export async function getDoctorById(id: number) {
 	return {
 		status: true,
 		message: 'Doctor details fetched successfully',
-		doctor: doctor,
+		data: doctor,
 	};
 }
 
@@ -94,6 +100,6 @@ export async function softDeleteDoctor(id: number) {
 	return {
 		status: true,
 		message: 'Doctor removed successfully',
-		doctor: doctor,
+		data: doctor,
 	};
 }

@@ -1,38 +1,25 @@
-
-import help from '../assets/help.jpg';
-import illustration from '../assets/illustration.jpeg';
-import {  Link } from "react-router-dom";
-
-
+import NavMenu from '@/components/NavMenu';
 
 function Home() {
- 
-return <>
-        <div style={{ boxShadow: '1px 1px 1px rgb(189, 181, 181);' }}>
-            <div style={{ display: 'flex;', justifyContent: 'space-between', }}>
-                <div style={{ padding: '20px' }}>
-                    <img src={help} width="150" />
-                </div>
-            </div>
-            <div style={{ display: 'flex' }}>
-                <div style={{ padding: '20px' }}>
-                <Link to="/doctors">  Doctors </Link>
-                </div>
-                <div style={{ padding: '20px' }}>
-                <Link to="/ambulances">   Ambulance</Link> 
-                </div>
-            </div>
-        </div>
-
-        <div style={{ display: 'flex', justifyContent: "center", paddingTop: '50px' }}>
-            <img src={illustration} width="1000" />
-        </div>
-        <div style={{ display: 'flex', justifyContent: "center" }}>
-            <h1 style={{ fontWeight: 'bold' }}>
-                Accident cases are increasing more nowadays. So this app needs to display the list of all nearby ambulance services and doctors based on location with one click.
-            </h1>
-        </div>
-    </>
+	return (
+		<>
+			<NavMenu />
+			<div className="flex flex-col items-center">
+				<img
+					src="src/assets/illustration.jpeg?height=400&width=600"
+					alt="Healthcare"
+					width={600}
+					height={400}
+					className="rounded-lg shadow-md mt-12"
+				/>
+				<p className="mt-4 text-lg text-center max-w-2xl">
+					Welcome to our Healthcare Management System. We provide easy access to
+					information about our doctors and ambulance services to ensure you
+					receive the best care possible.
+				</p>
+			</div>
+		</>
+	);
 }
 
 export default Home;
