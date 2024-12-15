@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { AppError } from './appError';
+import AppError from './appError';
 
 export default function globalErrorHandler(
 	err: any,
@@ -10,6 +10,9 @@ export default function globalErrorHandler(
 	console.error(err);
 	if (err.name === 'ZodError') {
 		err = new AppError(JSON.stringify(err.issues), 400, true);
+	}
+	if (err.name === 'MulterError') {
+		err = new AppError(err, 400);
 	}
 	if (process.env.NODE_ENV === 'development') {
 		sendErrorDev(err, res);

@@ -2,6 +2,7 @@ import express from 'express';
 import globalErrorHandler from '../utils/globalErrorHandler';
 import ambulanceRoutes from './ambulance';
 import doctorRoutes from './doctor';
+import fileRoutes from './file';
 
 const router = express.Router();
 
@@ -15,6 +16,7 @@ router.get('/check-health', (req, res) => {
 
 router.use('/v1/doctors', doctorRoutes);
 router.use('/v1/ambulances', ambulanceRoutes);
+router.use('/v1/files', fileRoutes);
 
 router.use('*', (req, res) => {
 	const response = {

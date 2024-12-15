@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
 import * as doctorService from '../services/doctor';
+import { queryValidator } from '../validators/common';
 import {
 	addDoctorValidator,
 	updateDoctorValidator,
@@ -22,8 +23,9 @@ export async function updateDoctor(req: Request, res: Response) {
 	return res.status(200).json(response);
 }
 
-export async function getDoctors(_req: Request, res: Response) {
-	const response = await doctorService.getDoctors();
+export async function getDoctors(req: Request, res: Response) {
+	const { page, limit } = queryValidator.parse(req.query);
+	const response = await doctorService.getDoctors(page, limit);
 
 	res.status(200).json(response);
 }
@@ -39,7 +41,7 @@ export async function getDoctorById(req: Request, res: Response) {
 export async function removeDoctor(req: Request, res: Response) {
 	const id = z.coerce.number().parse(req.params.id);
 
-	const response = await doctorService.removeDoctor(id);
+	const response = await doctorService.softDeleteDoctor(id);
 
 	return res.status(200).json(response);
 }
