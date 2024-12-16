@@ -4,7 +4,6 @@ import {
 	DialogClose,
 	DialogContent,
 	DialogFooter,
-	DialogHeader,
 	DialogTitle,
 } from '@/components/ui/dialog.tsx';
 import { Input } from '@/components/ui/input';
@@ -13,9 +12,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm } from 'react-hook-form'; // Import FormProvider
 import { z } from 'zod';
 import FileInput from './FileInput'; // Assuming FileInput is in the same directory
-import { useDoctorById } from '@/services/queries';
-import { useEffect, useState } from 'react';
-import { useAddDoctor, useUpdateDoctor } from '@/services/mutations';
+import { useAddDoctor } from '@/services/mutations';
 import { toast } from '@/hooks/use-toast';
 
 // Zod schema
@@ -33,6 +30,9 @@ const schema = z.object({
 		.email('Invalid email address'),
 	description: z.string().min(1, 'Description is required'),
 	location: z.string().optional(),
+	file: z
+		.string()
+		.optional(),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -40,12 +40,9 @@ type FormData = z.infer<typeof schema>;
 type Props = {
 	open: boolean;
 	setOpen: any;
-	id: number;
 };
 
-const DoctorFormDialog = ({ open, setOpen, id }: Props) => {
-	
-	const [fileKey,setFileKey] = useState();
+const AddDoctorFormDialog = ({ open, setOpen }: Props) => {
 
 	const methods = useForm<FormData>({
 		resolver: zodResolver(schema),
@@ -54,20 +51,19 @@ const DoctorFormDialog = ({ open, setOpen, id }: Props) => {
 	const {
 		handleSubmit,
 		reset,
-		setValue,
 		formState: { errors },
 	} = methods;
 	
-	const { data, isPending, isError } = useDoctorById(id)
-	const updateDoctorMutation = useUpdateDoctor()
+	
+	const addDoctorMutation = useAddDoctor()
 
 	const onSubmit = (data: FormData) => {
-		updateDoctorMutation.mutate(id)
-		data.id = id
+		console.log("data",data);
+		addDoctorMutation.mutate(data)
 		delete data.location
 		
 		toast({
-			title: "Doctor details updated successfully",
+			title: "Doctor details added successfully",
 			variant: "default"
 		})
 
@@ -75,19 +71,7 @@ const DoctorFormDialog = ({ open, setOpen, id }: Props) => {
 		setOpen(false); // Close dialog after submit
 	};
 	
-	if (isPending) {
-		return <div>Loading</div>
-	}
-
-	if (isError) {
-		return <div>Error...</div>
-	}
-
-	setValue("name", data.name || "")
-	setValue("age", data.age || 18)
-	setValue("specialty", data.specialty ?? "" )
-	setValue("contact", data.contact ?? "")
-	setValue("description", data.description ?? "")
+	  
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
@@ -227,4 +211,4 @@ const DoctorFormDialog = ({ open, setOpen, id }: Props) => {
 	);
 };
 
-export default DoctorFormDialog;
+export default AddDoctorFormDialog;

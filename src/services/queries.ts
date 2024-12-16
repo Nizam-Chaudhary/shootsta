@@ -15,7 +15,7 @@ export function useDoctors(queryOptions: QueryOptions) {
 	});
 }
 
-export function useDoctorById(id: number) {
+export function useDoctorById(id?: number) {
 	return useQuery({
 		queryKey: ['doctors', { id }],
 		queryFn: () => getDoctorById(id),

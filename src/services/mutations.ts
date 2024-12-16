@@ -11,17 +11,15 @@ import {
 	uploadFile,
 } from './api';
 
-export function useAddDoctor(doctor: any) {
+export function useAddDoctor() {
 	return useMutation({
-		mutationKey: ['doctors', { name: doctor.name }],
-		mutationFn: () => addDoctorDetails(doctor),
+		mutationFn: (doctor: any) => addDoctorDetails(doctor),
 	});
 }
 
-export function useUpdateDoctor(id: number, doctor: any) {
+export function useUpdateDoctor() {
 	return useMutation({
-		mutationKey: ['doctors', { id }],
-		mutationFn: () => updateDoctorDetails(id, doctor),
+		mutationFn: (doctor: any) => updateDoctorDetails(doctor),
 	});
 }
 
@@ -59,10 +57,10 @@ export function useDeleteAmbulance() {
 	});
 }
 
-export function useUploadFile(formData: FormData) {
+export function useUploadFile() {
 	return useMutation({
-		mutationKey: ['files'],
-		mutationFn: () => uploadFile(formData),
+		mutationFn: (formData: any) => {   
+			return uploadFile(formData) },
 	});
 }
 

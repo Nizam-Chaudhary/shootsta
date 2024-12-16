@@ -6,12 +6,7 @@ export const addAmbulanceValidator = z.object({
 		.min(2, 'title must be of at least 2 characters'),
 	contact: z.string().optional(),
 	description: z.string().optional(),
-	location: z
-		.object({
-			latitude: z.string({ message: 'latitude is required' }),
-			longitude: z.string({ message: 'longitude is required' }),
-		})
-		.optional(),
+	location: z.string().optional(),
 	imageUrl: z.string().optional(),
 });
 
@@ -22,12 +17,7 @@ export const updateAmbulanceValidator = z.object({
 		.optional(),
 	contact: z.string().optional(),
 	description: z.string().optional(),
-	location: z
-		.object({
-			latitude: z.string({ message: 'latitude is required' }),
-			longitude: z.string({ message: 'longitude is required' }),
-		})
-		.optional(),
+	location: z.string().optional(),
 	imageUrl: z.string().optional(),
 });
 

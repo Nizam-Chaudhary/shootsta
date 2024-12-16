@@ -10,12 +10,7 @@ export const addDoctorValidator = z.object({
 	specialty: z.string().optional(),
 	contact: z.string().optional(),
 	description: z.string().optional(),
-	location: z
-		.object({
-			latitude: z.string({ message: 'latitude is required' }),
-			longitude: z.string({ message: 'longitude is required' }),
-		})
-		.optional(),
+	location: z.string().optional(),
 	imageUrl: z.string().optional(),
 });
 
@@ -31,12 +26,7 @@ export const updateDoctorValidator = z.object({
 	specialty: z.string().optional(),
 	contact: z.string().optional(),
 	description: z.string().optional(),
-	location: z
-		.object({
-			latitude: z.string({ message: 'latitude is required' }),
-			longitude: z.string({ message: 'longitude is required' }),
-		})
-		.optional(),
+	location: z.string().optional(),
 	imageUrl: z.string().optional(),
 });
 

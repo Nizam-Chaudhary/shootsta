@@ -12,10 +12,7 @@ function getDummyData(numberOfRecords: number) {
 			specialty: faker.person.jobTitle(),
 			contact: faker.internet.email(),
 			description: faker.person.jobDescriptor(),
-			location: {
-				latitude: faker.location.latitude().toString(),
-				longitude: faker.location.longitude().toString(),
-			},
+			location: faker.location.city()
 		};
 		dataArray.push(data);
 	}

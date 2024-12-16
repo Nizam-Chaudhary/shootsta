@@ -8,6 +8,9 @@ import {
 	TableHeader,
 	TableRow,
 } from './ui/table';
+import DoctorFormDialog from './DoctorFormDialog';
+import { useState } from 'react';
+import { toast } from '@/hooks/use-toast';
 type Props<T> = {
 	table: TableType<T>;
 	isPending: boolean;
@@ -21,7 +24,11 @@ export function TableData<T>({
 	columns,
 	deleteMutation,
 }: Props<T>) {
+	const [open, setOpen] = useState(false)
+	const [id, setId] = useState<number>(0)
+
 	return (
+		<>
 		<Table>
 			<TableHeader>
 				{table.getHeaderGroups().map((headerGroup) => (
@@ -69,6 +76,15 @@ export function TableData<T>({
 										if (cell.id === `${row.id}_delete`) {
 											// @ts-ignore
 											deleteMutation.mutate(row.original.id);
+											toast({
+												title: "Removed successfully",
+												variant: "default"
+											})
+										}
+										if (cell.id === `${row.id}_update`) {
+											// @ts-ignore
+											setId(row.original.id)
+											setOpen(true)
 										}
 									}}
 								>
@@ -86,5 +102,10 @@ export function TableData<T>({
 				)}
 			</TableBody>
 		</Table>
+		{
+			open ? <DoctorFormDialog open={open} setOpen={setOpen} id={id}/> : null
+		}
+		
+		</>
 	);
 }

@@ -26,7 +26,7 @@ export async function getDoctors(options: QueryOptions) {
 	return data;
 }
 
-export async function getDoctorById(id: number) {
+export async function getDoctorById(id?: number) {
 	const data = (await instance.get(`doctors/${id}`)).data.data as Doctor;
 
 	return data;
@@ -38,8 +38,8 @@ export async function addDoctorDetails(doctor: any) {
 	return data;
 }
 
-export async function updateDoctorDetails(id: number, doctor: any) {
-	const data = (await instance.patch(`doctors/${id}`, doctor)).data
+export async function updateDoctorDetails(doctor: any) {
+	const data = (await instance.patch(`doctors/${doctor.id}`, doctor)).data
 		.data[0] as Doctor;
 
 	return data;
@@ -90,9 +90,7 @@ export async function removeAmbulance(id: number) {
 
 export async function uploadFile(formData: FormData) {
 	const data = (
-		await instance.post(`files/upload`, formData, {
-			headers: formData.getHeaders(),
-		})
+		await instance.post(`files/upload`, formData)
 	).data.fileKey as string;
 
 	return data;

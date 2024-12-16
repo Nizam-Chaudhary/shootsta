@@ -6,7 +6,6 @@ import {
 } from '@tanstack/react-table';
 import { Edit3, Trash2 } from 'lucide-react';
 
-import DoctorFormDialog from '@/components/DoctorFormDialog';
 import Paginate from '@/components/Paginate';
 import { TableData } from '@/components/TableData';
 import { Input } from '@/components/ui/input';
@@ -16,6 +15,9 @@ import { useDoctors } from '@/services/queries';
 import { Doctor } from '@/types/doctor';
 import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
 import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import DoctorFormDialog from '@/components/DoctorFormDialog';
+import AddDoctorFormDialog from '@/components/AddDoctorFormDialog';
 
 const columns: ColumnDef<Doctor>[] = [
 	{
@@ -81,12 +83,11 @@ const columns: ColumnDef<Doctor>[] = [
 export default function Doctors() {
 	const [page, setPage] = useState<number>(1);
 	const [limit, setLimit] = useState<number>(5);
-	const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 	const [search, setSearch] = useState<string | null>();
-
+	const [open, setOpen] = useState(false)
 	const deleteDoctorMutation = useDeleteDoctor();
 
-	const { data, isPending, isError, refetch } = useDoctors({
+	const { data, isPending, isError } = useDoctors({
 		page,
 		limit,
 		search,
@@ -110,7 +111,10 @@ export default function Doctors() {
 					<div className="flex items-center justify-start py-4 m-12">
 						<h1 className="text-2xl font-bold mb-2">Doctors</h1>
 					</div>
+
 					<div className="flex items-center justify-end py-4 m-12">
+				
+						<div>
 						<Input
 							placeholder="Search doctors..."
 							value={
@@ -121,7 +125,14 @@ export default function Doctors() {
 							}
 							className="max-w-sm justify-end"
 						/>
+						</div>
+						<div>
+						<Button variant='secondary' onClick={()=>{
+							setOpen(true);
+						}} >Create</Button>
 					</div>
+					</div>
+
 				</div>
 				<div className="rounded-md border">
 					<TableData<Doctor>
@@ -134,13 +145,11 @@ export default function Doctors() {
 				<div className="flex items-center justify-end space-x-2 py-4">
 					<Paginate page={page} setPage={setPage} />
 				</div>
+				{
+				open ? <AddDoctorFormDialog open={open} setOpen={setOpen}/> : null
+			}
+				
 			</div>
-			{isEditDialogOpen ? (
-				<DoctorFormDialog
-					open={isEditDialogOpen}
-					setOpen={setIsEditDialogOpen}
-				/>
-			) : null}
 		</>
 	);
 }

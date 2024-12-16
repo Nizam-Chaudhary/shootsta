@@ -1,6 +1,8 @@
 import { Input } from '@/components/ui/input'; // Assuming you have a basic Input component
 import { useRef } from 'react';
 import { useFormContext } from 'react-hook-form';
+import FormData from 'form-data';
+import { useUploadFile } from '@/services/mutations';
 
 type FileInputProps = {
 	id: string;
@@ -13,17 +15,27 @@ const FileInput = ({ id, name, label, required = false }: FileInputProps) => {
 	const {
 		register,
 		setValue,
-		formState: { errors },
 	} = useFormContext();
 	const fileInputRef = useRef<HTMLInputElement | null>(null);
+	const fileUploadMutation = useUploadFile()
 
 	// Handle file change
 	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const file = event.target.files?.[0];
-		if (file) {
-			setValue(name, file); // Set the selected file to React Hook Form's value
-		}
-		console.log(file);
+
+		const formData = new FormData();
+		formData.append('file', file);
+
+		console.log('formData', formData)
+		fileUploadMutation.mutate(formData, {
+		onSuccess: (data) => {
+			console.log('File upload successful:', data);
+			setValue("file", data);
+		},	
+		onError: (error) => {
+			console.error('File upload failed:', error);
+		},
+	});
 	};
 
 	return (

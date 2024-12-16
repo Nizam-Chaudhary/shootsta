@@ -10,10 +10,7 @@ function getDummyData(numberOfRecords: number) {
 			title: faker.vehicle.model(),
 			contact: faker.internet.email(),
 			description: faker.string.sample({ min: 20, max: 80 }),
-			location: {
-				latitude: faker.location.latitude().toString(),
-				longitude: faker.location.longitude().toString(),
-			},
+			location: faker.location.city(),
 		};
 		dataArray.push(data);
 	}
