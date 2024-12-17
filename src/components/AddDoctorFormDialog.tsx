@@ -8,12 +8,12 @@ import {
 } from '@/components/ui/dialog.tsx';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { toast } from '@/hooks/use-toast';
-import { useAddDoctor } from '@/services/mutations';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm } from 'react-hook-form'; // Import FormProvider
 import { z } from 'zod';
 import FileInput from './FileInput'; // Assuming FileInput is in the same directory
+import { useAddDoctor } from '@/services/mutations';
+import { toast } from '@/hooks/use-toast';
 
 // Zod schema
 const schema = z.object({
@@ -30,7 +30,9 @@ const schema = z.object({
 		.email('Invalid email address'),
 	description: z.string().min(1, 'Description is required'),
 	location: z.string().optional(),
-	file: z.string().optional(),
+	file: z
+		.string()
+		.optional(),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -41,6 +43,7 @@ type Props = {
 };
 
 const AddDoctorFormDialog = ({ open, setOpen }: Props) => {
+
 	const methods = useForm<FormData>({
 		resolver: zodResolver(schema),
 	});
@@ -50,26 +53,29 @@ const AddDoctorFormDialog = ({ open, setOpen }: Props) => {
 		reset,
 		formState: { errors },
 	} = methods;
-
-	const addDoctorMutation = useAddDoctor();
+	
+	
+	const addDoctorMutation = useAddDoctor()
 
 	const onSubmit = (data: FormData) => {
-		console.log('data', data);
-		addDoctorMutation.mutate(data);
-		delete data.location;
-
+		console.log("data",data);
+		addDoctorMutation.mutate(data)
+		delete data.location
+		
 		toast({
-			title: 'Doctor details added successfully',
-			variant: 'default',
-		});
+			title: "Doctor details added successfully",
+			variant: "default"
+		})
 
-		reset();
+		reset(); 
 		setOpen(false); // Close dialog after submit
 	};
+	
+	  
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
-			<DialogContent className=" shadow-lg rounded-lg max-w-lg w-full p-6 opacity-100">
+			<DialogContent className="bg-white shadow-lg rounded-lg max-w-lg w-full p-6 opacity-100">
 				<DialogTitle>
 					<h2>Add Doctor</h2>
 				</DialogTitle>

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 export default function NavMenu() {
 	return (
 		<div className="App">
-			<nav className="sticky top-0 shadow-md z-10">
+			<nav className="sticky top-0 bg-white shadow-md z-10">
 				<div className="container mx-auto px-4">
 					<div className="flex justify-between items-center py-4">
 						<div className="text-xl font-bold">Healthcare Management</div>

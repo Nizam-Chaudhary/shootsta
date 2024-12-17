@@ -19,7 +19,7 @@ export const doctors = sqliteTable('doctors', {
 	contact: text('contact', { length: 20 }),
 	description: text('description', { length: 512 }),
 	location: text('location', { length: 255 }),
-	imageFileKey: text('image_file_key', { mode: 'text' }).default('default.jpg'),
+	image_file_key: text('image_file_key', { mode: 'text' }).default('default.jpg'),
 	isDeleted: integer('is_deleted', { mode: 'boolean' }).default(false),
 	...timestamps,
 });
@@ -30,7 +30,7 @@ export const ambulances = sqliteTable('ambulances', {
 	contact: text('contact', { length: 20 }),
 	description: text('description', { length: 512 }),
 	location: text('location', { length: 255 }),
-	imageFileKey: text('image_file_key', { mode: 'text' }).default('default.jpg'),
+	image_file_key: text('image_file_key', { mode: 'text' }).default('default.jpg'),
 	isDeleted: integer('is_deleted', { mode: 'boolean' }).default(false),
 	...timestamps,
 });

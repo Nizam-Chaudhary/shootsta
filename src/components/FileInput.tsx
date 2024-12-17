@@ -1,5 +1,4 @@
-import { Input } from '@/components/ui/input'; // Assuming you have a basic Input component
-import { useRef } from 'react';
+import { Input } from '@/components/ui/input'; // Assuming you have a basic Input component 
 import { useFormContext } from 'react-hook-form';
 import FormData from 'form-data';
 import { useUploadFile } from '@/services/mutations';
@@ -8,16 +7,20 @@ type FileInputProps = {
 	id: string;
 	name: string;
 	label: string;
+	value?: string;
 	required?: boolean;
+	setUpload ?:any
+	upload ?:any
 };
 
-const FileInput = ({ id, name, label, required = false }: FileInputProps) => {
+const FileInput = ({ id, name, label, value ,required = false, setUpload, upload }: FileInputProps) => {
 	const {
 		register,
 		setValue,
-	} = useFormContext();
-	const fileInputRef = useRef<HTMLInputElement | null>(null);
+	} = useFormContext(); 
 	const fileUploadMutation = useUploadFile()
+
+	
 
 	// Handle file change
 	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -31,6 +34,7 @@ const FileInput = ({ id, name, label, required = false }: FileInputProps) => {
 		onSuccess: (data) => {
 			console.log('File upload successful:', data);
 			setValue("file", data);
+			setUpload(data);
 		},	
 		onError: (error) => {
 			console.error('File upload failed:', error);
@@ -45,15 +49,14 @@ const FileInput = ({ id, name, label, required = false }: FileInputProps) => {
 			</label>
 			<Input
 				id={id}
-				type="file"
-				{...register(name, { required: required })}
+				type="file" 
 				onChange={handleFileChange}
 				className="border p-2"
 			/>
 			<div>
-				{fileInputRef.current?.files && fileInputRef.current?.files[0] && (
+				{value && (
 					<p className="text-sm text-gray-500 mt-2">
-						File selected: {fileInputRef.current.files[0].name}
+						File selected: {value}
 					</p>
 				)}
 			</div>

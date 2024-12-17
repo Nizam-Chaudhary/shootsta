@@ -7,7 +7,7 @@ export type Ambulance = {
 		latitude: string;
 		longitude: string;
 	};
-	imageFileKey: string;
+	image_file_key: string;
 	isDeleted: string;
 	createdAt: string;
 	updatedAt: string;

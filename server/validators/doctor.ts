@@ -12,6 +12,7 @@ export const addDoctorValidator = z.object({
 	description: z.string().optional(),
 	location: z.string().optional(),
 	imageUrl: z.string().optional(),
+	image_file_key: z.string().optional(),
 });
 
 export const updateDoctorValidator = z.object({
@@ -28,6 +29,7 @@ export const updateDoctorValidator = z.object({
 	description: z.string().optional(),
 	location: z.string().optional(),
 	imageUrl: z.string().optional(),
+	image_file_key: z.string().optional(),
 });
 
 export type AddDoctor = z.infer<typeof addDoctorValidator>;
