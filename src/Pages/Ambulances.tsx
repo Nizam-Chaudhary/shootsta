@@ -6,7 +6,8 @@ import {
 } from "@tanstack/react-table";
 import { Edit3, Trash2 } from "lucide-react";
 
-import DoctorFormDialog from "@/components/DoctorFormDialog";
+import AddAmbulanceFormDialog from "@/components/AddAmbulanceFormDialog";
+import EditDoctorFormDialog from "@/components/EditDoctorFormDialog";
 import LimitDropdown from "@/components/LimitDropdown";
 import Paginate from "@/components/Paginate";
 import SearchBox from "@/components/SearchBox";
@@ -137,12 +138,7 @@ export default function Ambulances() {
           />
         </div>
       </div>
-      {isEditDialogOpen ? (
-        <DoctorFormDialog
-          open={isEditDialogOpen}
-          setOpen={setIsEditDialogOpen}
-        />
-      ) : null}
+      {open ? <AddAmbulanceFormDialog open={open} setOpen={setOpen} /> : null}
     </>
   );
 }

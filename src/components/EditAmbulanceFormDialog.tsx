@@ -9,22 +9,27 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
-import { useAddDoctor } from "@/services/mutations";
+import { useUpdateAmbulance, useUpdateDoctor } from "@/services/mutations";
+import { useAmbulanceById, useDoctorById } from "@/services/queries";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { QueryClient, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
+import { MessageCircleWarningIcon } from "lucide-react";
+import { useRef } from "react";
 import { FormProvider, useForm } from "react-hook-form"; // Import FormProvider
 import { z } from "zod";
 import FileInput from "./FileInput"; // Assuming FileInput is in the same directory
+import { LoadingSpinner } from "./LoadingSpinner";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./ui/tooltip";
 
 // Zod schema
 const schema = z.object({
   id: z.number().optional(),
-  name: z.string().min(1, "Name is required"),
-  age: z
-    .number()
-    .min(1, "Age must be greater than 0")
-    .max(120, "Age must be less than 120"),
-  specialty: z.string().min(1, "Specialty is required"),
+  title: z.string().min(1, "Name is required"),
   contact: z
     .string()
     .min(1, "Contact is required")
@@ -39,9 +44,10 @@ type FormData = z.infer<typeof schema>;
 type Props = {
   open: boolean;
   setOpen: any;
+  id: number;
 };
 
-const AddDoctorFormDialog = ({ open, setOpen }: Props) => {
+const EditAmbulanceFormDialog = ({ open, setOpen, id }: Props) => {
   const methods = useForm<FormData>({
     resolver: zodResolver(schema),
   });
@@ -49,42 +55,56 @@ const AddDoctorFormDialog = ({ open, setOpen }: Props) => {
   const {
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = methods;
+
+  const { data, isPending, isError } = useAmbulanceById(id);
+  const updateDoctorMutation = useUpdateAmbulance();
+
+  const value = useRef("");
   const queryClient = useQueryClient();
-  const addDoctorMutation = useAddDoctor();
+  console.log("data", data);
 
   const onSubmit = (data: FormData) => {
-    addDoctorMutation.mutate(data, {
-      onSuccess: () => {
-        toast({
-          title: "Doctor details added successfully",
-          variant: "default",
-        });
-        reset();
+    setTimeout(() => {
+      const model = {
+        ...data,
+        id: id,
+        imageFileKey: data.imageFileKey ? data.imageFileKey : value.current,
+      };
 
-        setOpen(false);
-        queryClient.invalidateQueries({ queryKey: ["doctors"] });
-      },
-      onError: () => {
-        toast({
-          title: "Something went wrong!",
-          variant: "default",
-        });
-      },
-    });
+      updateDoctorMutation.mutate(model, {
+        onSuccess: () => {
+          toast({
+            title: "Ambulance details updated successfully",
+            variant: "default",
+          });
+          reset();
 
-    toast({
-      title: "Doctor details added successfully",
-      variant: "default",
+          setOpen(false);
+          queryClient.invalidateQueries({ queryKey: ["ambulances"] });
+        },
+        onError: () => {
+          toast({
+            title: "Something went wrong!",
+            variant: "default",
+          });
+        },
+      });
     });
   };
+  setValue("title", data?.title || "");
+  setValue("contact", data?.contact ?? "");
+  setValue("description", data?.description ?? "");
+  setValue("location", data?.location ?? "");
+  setValue("imageFileKey", data?.imageFileKey ?? "");
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className=" shadow-lg rounded-lg max-w-lg w-full p-6 opacity-100">
+      <DialogContent className="shadow-lg rounded-lg max-w-lg w-full p-6 opacity-100">
         <DialogTitle>
-          <h2>Add Doctor</h2>
+          <h2>Edit Ambulance</h2>
         </DialogTitle>
 
         <FormProvider {...methods}>
@@ -93,49 +113,16 @@ const AddDoctorFormDialog = ({ open, setOpen }: Props) => {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <label htmlFor="name" className="block text-sm font-medium">
-                Name
+                Title
               </label>
               <Input
                 id="name"
-                {...methods.register("name")}
-                placeholder="Enter doctor's name"
+                {...methods.register("title")}
+                placeholder="Enter title"
                 className="mt-1"
               />
-              {errors.name && (
-                <p className="text-red-600 text-xs">{errors.name.message}</p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="age" className="block text-sm font-medium">
-                Age
-              </label>
-              <Input
-                id="age"
-                {...methods.register("age", { valueAsNumber: true })}
-                type="number"
-                placeholder="Enter doctor's age"
-                className="mt-1"
-              />
-              {errors.age && (
-                <p className="text-red-600 text-xs">{errors.age.message}</p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="specialty" className="block text-sm font-medium">
-                Specialty
-              </label>
-              <Input
-                id="specialty"
-                {...methods.register("specialty")}
-                placeholder="Enter doctor's specialty"
-                className="mt-1"
-              />
-              {errors.specialty && (
-                <p className="text-red-600 text-xs">
-                  {errors.specialty.message}
-                </p>
+              {errors.title && (
+                <p className="text-red-600 text-xs">{errors.title.message}</p>
               )}
             </div>
 
@@ -146,7 +133,7 @@ const AddDoctorFormDialog = ({ open, setOpen }: Props) => {
               <Input
                 id="contact"
                 {...methods.register("contact")}
-                placeholder="Enter doctor's contact"
+                placeholder="Enter ambulance's contact"
                 className="mt-1"
               />
               {errors.contact && (
@@ -193,17 +180,31 @@ const AddDoctorFormDialog = ({ open, setOpen }: Props) => {
 
             <div>
               <FileInput
-                id="file"
-                name="file"
+                id="imageFileKey"
+                name="imageFileKey"
                 label="Upload File"
                 required={true}
+                value={data?.imageFileKey}
               />
               {/* {errors.file && (
 								<p className="text-red-600 text-xs">File is required</p>
 							)} */}
             </div>
 
-            <DialogFooter>
+            <DialogFooter className="flex items-center ">
+              {isPending ? <LoadingSpinner /> : null}
+              {isError ? (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <MessageCircleWarningIcon />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Error loading data...</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              ) : null}
               <Button type="submit">Submit</Button>
               <DialogClose asChild>
                 <Button variant="outline" type="button">
@@ -218,4 +219,4 @@ const AddDoctorFormDialog = ({ open, setOpen }: Props) => {
   );
 };
 
-export default AddDoctorFormDialog;
+export default EditAmbulanceFormDialog;
