@@ -3,7 +3,8 @@ import { UseMutationResult } from "@tanstack/react-query";
 import { flexRender, Table as TableType } from "@tanstack/react-table";
 import { useState } from "react";
 import ConfirmationDialog from "./ConfirmationDiaolog";
-import DoctorFormDialog from "./DoctorFormDialog";
+import EditAmbulanceFormDialog from "./EditAmbulanceFormDialog";
+import EditDoctorFormDialog from "./EditDoctorFormDialog";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { Dialog } from "./ui/dialog";
 import {
@@ -28,7 +29,8 @@ export function TableData<T>({
   columns,
   deleteMutation,
 }: Props<T>) {
-  const [open, setOpen] = useState(false);
+  const [openEditDoctorDialog, setOpenEditDoctorDialog] = useState(false);
+  const [openEditAmbulanceDialog, setOpenEditAmbulanceDialog] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [id, setId] = useState<number>(0);
 
@@ -83,13 +85,19 @@ export function TableData<T>({
                       console.log("cell", cell);
                       if (cell.id === `${row.id}_delete`) {
                         setDeleteDialog(true);
+                        console.log(row.original);
                         // @ts-ignore
                         setId(row.original.id);
                       }
                       if (cell.id === `${row.id}_update`) {
                         // @ts-ignore
                         setId(row.original.id);
-                        setOpen(true);
+                        // @ts-ignore
+                        if (row.original?.title) {
+                          setOpenEditAmbulanceDialog(true);
+                        } else {
+                          setOpenEditDoctorDialog(true);
+                        }
                       }
                     }}
                   >
@@ -110,8 +118,19 @@ export function TableData<T>({
           )}
         </TableBody>
       </Table>
-      {open ? (
-        <DoctorFormDialog open={open} setOpen={setDeleteDialog} id={id} />
+      {openEditDoctorDialog ? (
+        <EditDoctorFormDialog
+          open={openEditDoctorDialog}
+          setOpen={setOpenEditDoctorDialog}
+          id={id}
+        />
+      ) : null}
+      {openEditAmbulanceDialog ? (
+        <EditAmbulanceFormDialog
+          open={openEditAmbulanceDialog}
+          setOpen={setOpenEditAmbulanceDialog}
+          id={id}
+        />
       ) : null}
       {deleteDialog && id ? (
         <ConfirmationDialog<T>

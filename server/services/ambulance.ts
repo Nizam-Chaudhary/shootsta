@@ -63,13 +63,13 @@ export async function getAmbulances(
     where: and(eq(ambulances.isDeleted, false), searchConditions),
     limit: limit,
     offset: offset,
+    orderBy: desc(ambulances.updatedAt),
   });
 
   const countPromise = db
     .select({ count: count() })
     .from(ambulances)
-    .where(and(eq(ambulances.isDeleted, false), searchConditions))
-    .orderBy(desc(ambulances.updatedAt));
+    .where(and(eq(ambulances.isDeleted, false), searchConditions));
 
   const [total, ambulanceList] = await Promise.all([
     countPromise,
