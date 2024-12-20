@@ -9,8 +9,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
-import { useUpdateAmbulance, useUpdateDoctor } from "@/services/mutations";
-import { useAmbulanceById, useDoctorById } from "@/services/queries";
+import { useUpdateAmbulance } from "@/services/mutations";
+import { useAmbulanceById } from "@/services/queries";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { MessageCircleWarningIcon } from "lucide-react";

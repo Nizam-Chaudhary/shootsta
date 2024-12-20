@@ -104,7 +104,7 @@ const EditDoctorFormDialog = ({ open, setOpen, id }: Props) => {
   setValue("contact", data?.contact ?? "");
   setValue("description", data?.description ?? "");
   setValue("location", data?.location ?? "");
-  setValue("imageFileKey", value.current ?? "");
+  setValue("imageFileKey", data?.imageFileKey);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
